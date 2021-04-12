@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Optional, Union
 from dramatiq.broker import Broker
 from dramatiq.message import Message
 from dramatiq.middleware import Middleware, default_middleware
+from dramatiq.errors import Retry
 from sentry_sdk import Hub
 from sentry_sdk.integrations import Integration
 from sentry_sdk.utils import (
@@ -97,7 +98,7 @@ class SentryMiddleware(Middleware):
             return
 
         try:
-            if exception is not None:
+            if exception is not None and not isinstance(exception, Retry):
                 event, hint = event_from_exception(
                     exception,
                     client_options=hub.client.options,
